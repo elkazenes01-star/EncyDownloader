@@ -96,15 +96,11 @@ def download(video_id):
     fmt = request.args.get("format", "mp4")
     url = f"https://www.youtube.com/watch?v={video_id}"
 
-    # Clean up old files to prevent disk filling up on Render free tier
     cleanup_old_downloads()
-
-    # Generate a unique filename to avoid conflicts
     unique_id = uuid.uuid4().hex[:8]
     base_filename = f"{video_id}_{unique_id}"
 
     if fmt == "mp3":
-        # Output template: yt-dlp will append the extension
         output_template = os.path.join(DOWNLOAD_DIR, f"{base_filename}.%(ext)s")
         cmd = [
             "yt-dlp",
@@ -119,18 +115,17 @@ def download(video_id):
         mimetype = "audio/mpeg"
     else:
         output_template = os.path.join(DOWNLOAD_DIR, f"{base_filename}.%(ext)s")
+        # Use format 18 (360p MP4) as it is usually a single file, no muxing needed
         cmd = [
             "yt-dlp",
             url,
-            "-f", "bestvideo[height<=720]+bestaudio/best[height<=720]/best",
-            "--merge-output-format", "mp4",
+            "-f", "18/best",
             "-o", output_template,
             "--no-playlist",
         ]
         expected_ext = "mp4"
         mimetype = "video/mp4"
 
-    # Get the title for the download filename shown to user
     title = video_id
     try:
         title_cmd = ["yt-dlp", url, "--get-title", "--no-playlist"]
@@ -141,36 +136,29 @@ def download(video_id):
     except Exception:
         pass
 
-    # Run the download to disk
     try:
         result = subprocess.run(cmd, capture_output=True, text=True, timeout=300)
     except subprocess.TimeoutExpired:
-        abort(504, description="Download timed out. Try a shorter video.")
+        abort(504, description="Download timed out.")
     except Exception as e:
         abort(500, description=f"Download failed: {str(e)}")
 
-    # Find the downloaded file (yt-dlp may adjust the extension)
     downloaded_file = None
-
-    # First check for the expected file
     expected_path = os.path.join(DOWNLOAD_DIR, f"{base_filename}.{expected_ext}")
     if os.path.isfile(expected_path):
         downloaded_file = expected_path
     else:
-        # Look for any file matching our base_filename pattern
         pattern = os.path.join(DOWNLOAD_DIR, f"{base_filename}.*")
         matches = glob.glob(pattern)
         if matches:
             downloaded_file = matches[0]
 
     if not downloaded_file or not os.path.isfile(downloaded_file):
-        abort(500, description="Download failed. The file could not be saved.")
+        abort(500, description="Download failed.")
 
-    # Determine the actual extension for the user-facing filename
     actual_ext = os.path.splitext(downloaded_file)[1].lstrip(".")
     download_name = f"{title}.{actual_ext}"
 
-    # Schedule file deletion after sending
     @after_this_request
     def remove_file(response):
         try:
@@ -186,33 +174,6 @@ def download(video_id):
         as_attachment=True,
         download_name=download_name,
     )
-
-
-@app.route("/get-url/<video_id>")
-def get_url(video_id):
-    """Get direct download URL for the video."""
-    fmt = request.args.get("format", "mp4")
-    url = f"https://www.youtube.com/watch?v={video_id}"
-
-    if fmt == "mp3":
-        cmd = ["yt-dlp", url, "-x", "--audio-format", "mp3", "--get-url"]
-    else:
-        cmd = ["yt-dlp", url, "-f", "bestvideo[height<=720]+bestaudio/best[height<=720]/best", "--get-url"]
-
-    try:
-        result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
-        direct_url = result.stdout.strip().split("\n")[0]
-        if direct_url:
-            return redirect(direct_url)
-    except Exception:
-        pass
-
-    return redirect(url_for("download", video_id=video_id, format=fmt))
-
-
-@app.route("/pricing")
-def pricing():
-    return render_template("pricing.html")
 
 
 @app.route("/subscribe")
