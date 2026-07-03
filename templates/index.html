@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}YT Downloader - Search & Download{% endblock %}
+
+{% block content %}
+<div class="hero">
+    <h1>YouTube Video Downloader</h1>
+    <p>Search for any YouTube video and download it as MP3 or MP4</p>
+    <form action="{{ url_for('search') }}" method="GET" class="search-form">
+        <input type="text" name="q" placeholder="Search for videos..." required autocomplete="off">
+        <button type="submit">Search</button>
+    </form>
+</div>
+
+<div class="features">
+    <div class="feature-card">
+        <h3>&#127925; MP3 Audio</h3>
+        <p>Extract high-quality audio from any YouTube video</p>
+    </div>
+    <div class="feature-card">
+        <h3>&#127916; MP4 Video</h3>
+        <p>Download videos in 720p or the highest available quality</p>
+    </div>
+    <div class="feature-card">
+        <h3>&#9889; Fast & Free</h3>
+        <p>No registration required. Start downloading instantly</p>
+    </div>
+</div>
+{% endblock %}
