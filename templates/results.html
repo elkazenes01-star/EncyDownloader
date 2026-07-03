@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Search: {{ query }} - YT Downloader{% endblock %}
+
+{% block content %}
+<div class="search-header">
+    <form action="{{ url_for('search') }}" method="GET" class="search-form search-form-inline">
+        <input type="text" name="q" value="{{ query }}" placeholder="Search for videos..." required>
+        <button type="submit">Search</button>
+    </form>
+    <p class="results-count">{{ videos|length }} results for "<strong>{{ query }}</strong>"</p>
+</div>
+
+{% if videos %}
+<div class="video-grid">
+    {% for video in videos %}
+    <div class="video-card">
+        <div class="thumbnail-container">
+            <img src="{{ video.thumbnail }}" alt="{{ video.title }}" class="thumbnail" loading="lazy">
+            {% if video.duration %}
+            <span class="duration">{{ video.duration }}</span>
+            {% endif %}
+        </div>
+        <div class="video-info">
+            <h3 class="video-title">{{ video.title }}</h3>
+            <p class="video-channel">{{ video.channel }}</p>
+            <div class="download-buttons">
+                <a href="{{ url_for('download', video_id=video.id, format='mp3') }}" class="btn btn-mp3" title="Download MP3">
+                    &#127925; MP3
+                </a>
+                <a href="{{ url_for('download', video_id=video.id, format='mp4') }}" class="btn btn-mp4" title="Download MP4 (720p)">
+                    &#127916; MP4
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="no-results">
+    <h2>No results found</h2>
+    <p>Try a different search term</p>
+</div>
+{% endif %}
+{% endblock %}
