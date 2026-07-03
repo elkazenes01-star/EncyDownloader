@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}Postani Pro - EncyDownloader{% endblock %}
+
+{% block content %}
+<div class="pricing-hero">
+    <h1>Postani Pro &#11088;</h1>
+    <p>Otključaj premium mogućnosti za najbolje iskustvo skidanja sadržaja</p>
+</div>
+
+<div class="pricing-grid">
+    <div class="pricing-card">
+        <div class="pricing-header">
+            <h3>Besplatno</h3>
+            <div class="price">0€<span>/mjesečno</span></div>
+        </div>
+        <ul class="pricing-features">
+            <li>&#10004; Pretraga YouTube videa</li>
+            <li>&#10004; Skidanje MP3 zvuka</li>
+            <li>&#10004; Skidanje MP4 (720p)</li>
+            <li>&#10060; Bez grupnog skidanja</li>
+            <li>&#10060; Bez podrške za plejliste</li>
+            <li>&#10060; Standardna brzina</li>
+        </ul>
+        <a href="{{ url_for('index') }}" class="btn btn-free">Trenutni plan</a>
+    </div>
+
+    <div class="pricing-card pricing-card-featured">
+        <div class="badge">Najpopularnije</div>
+        <div class="pricing-header">
+            <h3>Pro</h3>
+            <div class="price">10€<span>/mjesečno</span></div>
+        </div>
+        <ul class="pricing-features">
+            <li>&#10004; Sve iz Besplatnog paketa</li>
+            <li>&#10004; 4K video download</li>
+            <li>&#10004; Grupno skidanje videa</li>
+            <li>&#10004; Podrška za cijele plejliste</li>
+            <li>&#10004; Prioritetna brzina</li>
+            <li>&#10004; Bez reklama</li>
+        </ul>
+        <a href="{{ url_for('subscribe') }}" class="btn btn-subscribe">Kupi Pretplatu</a>
+    </div>
+
+    <div class="pricing-card">
+        <div class="pricing-header">
+            <h3>Godišnja</h3>
+            <div class="price">59€<span>/godišnje</span></div>
+        </div>
+        <ul class="pricing-features">
+            <li>&#10004; Sve iz Pro paketa</li>
+            <li>&#10004; Ušteda od preko 50%</li>
+            <li>&#10004; Rani pristup novim funkcijama</li>
+            <li>&#10004; Prioritetna podrška</li>
+            <li>&#10004; API pristup</li>
+            <li>&#10004; Prilagođeni formati</li>
+        </ul>
+        <a href="{{ url_for('subscribe') }}" class="btn btn-subscribe">Kupi Godišnju</a>
+    </div>
+</div>
+{% endblock %}
